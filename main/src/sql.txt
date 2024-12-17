@@ -1,0 +1,15 @@
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER NOT NULL,
+    super_admin SMALLINT,
+    department_admin SMALLINT,
+    super_checker SMALLINT,
+    department_checker SMALLINT,
+    department_maker SMALLINT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
+ALTER TABLE public.users
+DROP COLUMN role;

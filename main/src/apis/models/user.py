@@ -18,7 +18,7 @@ class CreateUser(BaseModel):
     name: str = Field(..., min_length=2, max_length=100, description="User's full name")
     username: EmailStr = Field(..., description="User's email address")
     password: str = Field(..., min_length=8, description="Password with at least 8 characters")
-    role: str = Field(default='user', description="Role assigned to the user (e.g., user, admin)")
+   
 
     # Fields that are now required
     phone: str = Field(..., description="User's phone number")
