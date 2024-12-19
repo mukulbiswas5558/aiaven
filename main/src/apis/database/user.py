@@ -58,15 +58,15 @@ async def create_user_service(user: CreateUser):
     query = """
     INSERT INTO users (name, username, password, phone, department, employee_type, 
             job_position, company, bank_name, account_number, bank_country, 
-            city, state, country, postal_code, shift_information, reporting_manager, 
+            city, state, country, postal_code, department_id, role, shift_information, reporting_manager, 
             work_location, work_type, salary, branch, bank_address, bank_code_1, 
             bank_code_2, address_line_1, address_line_2, district) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27) 
-    RETURNING id, name, username;
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,$28,$29) 
+    RETURNING id, name, username, role;
     """
     result = await db.fetchrow(query, user.name, user.username, hashed_password, user.phone, user.department, user.employee_type,
                                user.job_position, user.company, user.bank_name, user.account_number, user.bank_country,
-                               user.city, user.state, user.country, user.postal_code, user.shift_information, user.reporting_manager,
+                               user.city, user.state, user.country, user.postal_code, int(user.department_id), user.role, user.shift_information, user.reporting_manager,
                                user.work_location, user.work_type, user.salary, user.branch, user.bank_address, user.bank_code_1,
                                user.bank_code_2, user.address_line_1, user.address_line_2, user.district)
 
@@ -74,33 +74,13 @@ async def create_user_service(user: CreateUser):
         db.close()
         raise HTTPException(status_code=500, detail="User registration failed.")
     
-    query_roles = """
-    INSERT INTO roles (user_id, super_admin, department_admin, super_checker, department_checker, department_maker)
-    VALUES ($1, 1, 1, 0, 0, 0);
-    """
-    await db.execute(query_roles, result["id"])
-
-    # Fetch roles where the value is 1
-    query_get_roles = """
-    SELECT 
-        CASE WHEN super_admin = 1 THEN 'super_admin' END AS super_admin,
-        CASE WHEN department_admin = 1 THEN 'department_admin' END AS department_admin,
-        CASE WHEN super_checker = 1 THEN 'super_checker' END AS super_checker,
-        CASE WHEN department_checker = 1 THEN 'department_checker' END AS department_checker,
-        CASE WHEN department_maker = 1 THEN 'department_maker' END AS department_maker
-    FROM roles
-    WHERE user_id = $1;
-    """
-    role_result = await db.fetchrow(query_get_roles, result["id"])
-
-    # Filter out None values and collect roles with value 1
-    roles = [role for role in role_result.values() if role]
+    
 
     # Prepare user data for token creation
     user_data = {
         "id": result["id"],
         "username": result["username"],
-        "roles": roles  # Add roles to the user data
+        "role": result["role"]  # Add roles to the user data
     }
 
     # Create access and refresh tokens
@@ -114,7 +94,7 @@ async def create_user_service(user: CreateUser):
         "user": {
             "id": result["id"],
             "username": result["username"],
-            "roles": roles
+            "role": result["role"]
         },
         "access_token": access_token,
         "refresh_token": refresh_token

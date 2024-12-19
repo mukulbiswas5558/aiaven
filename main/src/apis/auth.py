@@ -22,7 +22,7 @@ async def create_user(user: CreateUser):
         return await create_user_service(user)
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Error creating user: ")
+        raise HTTPException(status_code=400, detail=f"Error creating user:{e} ")
     
 @router.post("/login")
 async def login(request: Request, response: Response, user: UserCredentials):
@@ -70,18 +70,22 @@ async def refresh_token(response: Response, token: str = Depends(get_bearer_toke
         "username": payload["username"],
         "role": payload["role"]
     }
-    new_access_token = create_access_token(data=user_data)
-
-    # Set the new access token in HttpOnly cookies
-    response.set_cookie(
-        key="access_token",
-        value=new_access_token,
-        httponly=True,
-        secure=True,  # Make sure to use secure cookies in production (for HTTPS)
-        samesite="Strict",  # Adjust the SameSite policy based on your needs
-    )
-
     return JSONResponse(
-        content={"message": "Token refreshed successfully"},
-        status_code=status.HTTP_200_OK,
-    )
+                status_code=200,
+                content=user_data
+            )
+    # new_access_token = create_access_token(data=user_data)
+
+    # # Set the new access token in HttpOnly cookies
+    # response.set_cookie(
+    #     key="access_token",
+    #     value=new_access_token,
+    #     httponly=True,
+    #     secure=True,  # Make sure to use secure cookies in production (for HTTPS)
+    #     samesite="Strict",  # Adjust the SameSite policy based on your needs
+    # )
+
+    # return JSONResponse(
+    #     content={"message": "Token refreshed successfully"},
+    #     status_code=status.HTTP_200_OK,
+    # )
