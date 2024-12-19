@@ -32,7 +32,8 @@ class CreateUser(BaseModel):
     city: str = Field(..., description="City")
     state: str = Field(..., description="State")
     country: str = Field(..., description="Country")
-    postal_code: str = Field(..., description="Postal code")
+    
+    department_id: str = Field(..., description="Department id code")
 
     # Optional fields
     shift_information: Optional[str] = None
@@ -47,6 +48,7 @@ class CreateUser(BaseModel):
     address_line_1: Optional[str] = None
     address_line_2: Optional[str] = None
     district: Optional[str] = None
+    role: str = Field(default="user", description="Role of the user (default: user)")
 
     # Password validation
     @field_validator("password")

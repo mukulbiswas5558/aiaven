@@ -13,3 +13,32 @@ CREATE TABLE roles (
 
 ALTER TABLE public.users
 DROP COLUMN role;
+
+
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY, -- Auto-incrementing department ID
+    code VARCHAR(50) NOT NULL UNIQUE, -- Unique department code
+    description TEXT, -- Department description
+    manager_id INT, -- User ID of the department manager (foreign key to users)
+    budget DECIMAL(15, 2), -- Annual budget for the department
+    location VARCHAR(225), -- Department location
+    phone VARCHAR(50), -- Department contact phone
+    email VARCHAR(225), -- Department email address
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+
+    CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES users (id)
+);
+ALTER TABLE public.users
+ADD COLUMN role VARCHAR(50);
+
+ALTER TABLE public.roles RENAME TO permission;
+ALTER TABLE public.permission
+DROP COLUMN created_at,
+DROP COLUMN user_id;
+ALTER TABLE public.permission
+DROP COLUMN created_at;
+
+ALTER TABLE users
+ADD COLUMN department_id INT,
+ADD CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES departments (id) ON DELETE CASCADE;
