@@ -15,16 +15,3 @@ JWT_REFRESH_SECRET_KEY = env("JWT_REFRESH_SECRET_KEY", "default_refresh_secret")
 # Algorithm (HS256 is a common default)
 ALGORITHM = env("ALGORITHM", "HS256")
 
-
-
-
-
-
-
-
-# ALGORITHM=HS256
-# ACCESS_TOKEN_EXPIRE_MINUTES=30
-# REFRESH_TOKEN_EXPIRE_MINUTES=10080
-# JWT_SECRET_KEY=your_access_secret_key
-# JWT_REFRESH_SECRET_KEY=your_refresh_secret_key
-# DATABASE_URL=postgresql://postgres:password@localhost/test

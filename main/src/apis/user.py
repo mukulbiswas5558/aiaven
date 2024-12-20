@@ -13,15 +13,21 @@ from fastapi import APIRouter, HTTPException
 router = APIRouter(prefix="/api/user", tags=["USERS"])
 
 
-@router.get("/get-user", response_model=User)
+@router.get("/get-user")
 async def get_user(userid: int = None):
     """
     Get a single user from the database using the user ID
     """
-    user_data = await get_an_user_from_database(userid)
-    if not user_data:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user_data
+    try:
+
+        # Pass the user to the service to save
+        return await get_an_user_from_database(userid)
+        
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error getting user: {e}")
+    
+   
 
 
 @router.get("/get-all-users", response_model=list[User])

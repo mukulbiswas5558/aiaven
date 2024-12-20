@@ -1,20 +1,18 @@
 from fastapi import HTTPException
 from tools.database import Db
-from main.src.apis.models.user import User,CreateUser,UpdateUser
-from tools.token import create_access_token, create_refresh_token,get_password_hash
-from typing import Dict
 from asyncpg import Record
+
+from main.src.apis.models.user import User, UserCredentials,CreateUser,UpdateUser
+from datetime import datetime
+from tools.token import create_access_token, create_refresh_token,get_password_hash
 async def get_an_user_from_database(userid: int = None):
     db = await Db()
-
     result = await db.fetchrow("SELECT name, username, role FROM users WHERE id = $1", userid)
+
 
     db.close()
 
-    if not userid:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return User(**result)
+    return result
 
 
 async def get_all_users_from_database():
@@ -25,7 +23,7 @@ async def get_all_users_from_database():
 
 async def verify_user(username):
     db = await Db()
-    result = await db.fetchrow("SELECT id, username, password FROM users WHERE username = $1", username)
+    result = await db.fetchrow("SELECT id, username, password, role FROM users WHERE username = $1", username)
     await db.close()  # Don't forget to close the database connection
     return result
 
@@ -101,7 +99,7 @@ async def create_user_service(user: CreateUser):
     }
 
 async def update_user_service(username: str, user_data: UpdateUser):
-
+    
     try:
         db = await Db()  # Initialize database connection
         
@@ -131,7 +129,7 @@ async def update_user_service(username: str, user_data: UpdateUser):
             updated_user: Record = await db.fetchrow(query, *values)
 
         if not updated_user:
-            raise HTTPException(status_code=404, detail="update failed.")
+            raise HTTPException(status_code=404, detail="User not found or update failed.")
 
         return {
             "message": "User updated successfully.",
@@ -139,4 +137,5 @@ async def update_user_service(username: str, user_data: UpdateUser):
         }
 
     except Exception as e:
+        print(f"Error while updating user: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while updating the user.")

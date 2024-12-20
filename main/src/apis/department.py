@@ -39,7 +39,7 @@ async def get_all_departments():
 
 # Route to create a new department (requires specific roles)
 @router.post("/create-department")
-async def create_department(department: Department, user=Depends(role_required(["department_maker", "super_admin"]))):
+async def create_department(department: Department, user=Depends(role_required(["department_maker", "super_admin", "admin"]))):
     """
     Create a new department
     """
@@ -84,4 +84,4 @@ async def delete_department(department_id: int, user=Depends(role_required(["dep
     try:
         return await delete_department_service(department_id)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error deleting department: {e}")
+        raise HTTPException(status_code=400, detail=f"Error deleting department: ")

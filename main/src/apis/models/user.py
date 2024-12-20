@@ -4,9 +4,9 @@ from typing import Optional
 
 
 class User(BaseModel):
-    name : str
-    username: str
-    role: str
+    name: Optional[str] = None
+    username: Optional[str] = None
+    role: Optional[str] = None
 
 class UserCredentials(BaseModel):
     username: str

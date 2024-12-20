@@ -8,7 +8,7 @@ async def get_a_department_from_database(department_id: int):
     db = await Db()
 
     result = await db.fetchrow(
-        "SELECT id, code, description, manager_id, budget, location, phone, email, created_at, updated_at FROM departments WHERE id = $1",
+        "SELECT id, name, description, manager_id, budget, location, phone, email, created_at, updated_at FROM departments WHERE id = $1",
         department_id
     )
 
@@ -23,7 +23,7 @@ async def get_a_department_from_database(department_id: int):
 async def get_all_departments_from_database():
     db = await Db()
     result = await db.fetch(
-        "SELECT id, code, description, manager_id, budget, location, phone, email, created_at, updated_at FROM departments"
+        "SELECT id, name, description, manager_id, budget, location, phone, email, created_at, updated_at FROM departments"
     )
     db.close()
     return [Department(**department) for department in result]
@@ -33,8 +33,8 @@ async def create_department_service(department: Department):
     db = await Db()
 
     # Check if the department code already exists
-    query_check = "SELECT id FROM departments WHERE code = $1"
-    existing_department = await db.fetchrow(query_check, department.code)
+    query_check = "SELECT id FROM departments WHERE name = $1"
+    existing_department = await db.fetchrow(query_check, department.name)
 
     if existing_department:
         db.close()
@@ -42,16 +42,15 @@ async def create_department_service(department: Department):
 
     # Insert the new department into the database
     query = """
-    INSERT INTO departments (code, description, manager_id, budget, location, phone, email)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id, code, description, manager_id, budget, location, phone, email, created_at, updated_at;
+    INSERT INTO departments (name, description, manager_id, location, phone, email)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id, name, description, manager_id, location, phone, email, created_at, updated_at;
     """
     result = await db.fetchrow(
         query,
-        department.code,
+        department.name,
         department.description,
         department.manager_id,
-        department.budget,
         department.location,
         department.phone,
         department.email
@@ -62,7 +61,7 @@ async def create_department_service(department: Department):
         raise HTTPException(status_code=500, detail="Department creation failed.")
 
     db.close()
-    return Department(**result)
+    return result
 
 # Update an existing department
 async def update_department_service(department_id: int, department_data: Dict):

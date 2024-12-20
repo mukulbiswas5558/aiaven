@@ -2,10 +2,9 @@ from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import Optional
 
 class Department(BaseModel):
-    code: str = Field(..., min_length=1, max_length=50, description="Unique department code")
+    name: str = Field(..., min_length=1, max_length=50, description="Unique department code")
     description: Optional[str] = Field(None, description="Department description")
     manager_id: Optional[int] = Field(None, description="User ID of the department manager")
-    budget: float = Field(..., ge=0, description="Annual budget for the department")
     location: str = Field(..., min_length=1, max_length=225, description="Department location")
     phone: str = Field(..., min_length=1, max_length=50, description="Department contact phone")
     email: EmailStr = Field(..., description="Department email address")
@@ -14,12 +13,7 @@ class Department(BaseModel):
     # Code validation
   
 
-    # Budget validation
-    @field_validator("budget", mode="before")
-    def validate_budget(cls, value):
-        if value < 0:
-            raise ValueError("Budget must be a positive number.")
-        return value
+    
 
     # Phone number validation
     @field_validator("phone", mode="before")

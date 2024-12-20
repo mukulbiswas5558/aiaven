@@ -29,7 +29,7 @@ class RoleMiddleware(BaseHTTPMiddleware):
         return path in public_routes
 
     async def validate_access_token(self, token: str):
-        url = "http://127.0.0.1:8000/api/auth/refresh"
+        url = "http://127.0.0.1:8000/api/auth/validate_token"
         headers = {"Authorization": f"Bearer {token}"}
         
         async with httpx.AsyncClient() as client:
@@ -74,7 +74,7 @@ def get_bearer_token(request: Request):
 
 # Function to validate the access token and get user role (used by both middleware and role_required)
 async def validate_access_token(token: str):
-    url = "http://127.0.0.1:8000/api/auth/refresh"
+    url = "http://127.0.0.1:8000/api/auth/validate_token"
     headers = {"Authorization": f"Bearer {token}"}
     
     async with httpx.AsyncClient() as client:
